@@ -1,0 +1,175 @@
+/* CLOSE BUTTON */
+#closebutton {
+    background-color: #444;
+    width: 46px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    vertical-align: middle;
+    -webkit-app-region: no-drag;
+    margin: -1px 1px 1px 1px;
+    height: 18px;
+
+    outline: 1px solid #333;
+    box-shadow: 0 0 2px 2px #666;
+    /*box-shadow: 0 0 1px 1px #2d2d2d, 0 0 1px 2px #666, 0 0 0 3px #6b6b6b;*/
+    z-index: 10;
+}
+
+#closebutton:hover > #closebutton-normal {
+    transition: opacity 0.2s;
+    opacity: 0;
+}
+
+#closebutton:hover > #closebutton-hover {
+    transition: opacity 0.2s;
+    opacity: 1;
+}
+
+#closebutton-normal {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-image: url("img/close-idle.png");
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    opacity: 1;
+    z-index: 13;
+    -webkit-filter: unset;
+}
+
+#closebutton-hover {
+    position: relative;
+    margin-top: -18px;
+    width: 100%;
+    height: 100%;
+    background-image: url("img/close-hover.png");
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    transition: opacity 0.8s;
+    opacity: 0;
+    z-index: 14;
+}
+
+/* OTHER BUTTON'S */
+#otherbutton {
+    background-color: #444;
+    width: 27px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    vertical-align: middle;
+    -webkit-app-region: no-drag;
+    margin: -1px 0 1px 1px;
+    height: 18px;
+    outline: 1px solid #333;
+
+    box-shadow: -1px 1px 3px 1px #666;
+    /*box-shadow: 0 0 1px 1px #000;*/
+    z-index: 10;
+}
+
+#otherbutton:hover > #otherbutton-normal {
+    transition: opacity 0.2s;
+    opacity: 0;
+}
+
+#otherbutton:hover > #otherbutton-hover {
+    transition: opacity 0.2s;
+    opacity: 1;
+}
+
+#otherbutton-normal {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-image: url("img/alt-idle.png");
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    opacity: var(--buttonsopacity);
+    z-index: 13;
+}
+
+#otherbutton-hover {
+    position: relative;
+    margin-top: -18px;
+    width: 100%;
+    height: 100%;
+    background-image: url("img/alt-hover.png");
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    transition: opacity 0.8s;
+    opacity: 0;
+    z-index: 14;
+}
+
+/* ICONS */
+#closebutton-icon {
+    position: relative;
+    margin-top: -15px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 12px;
+    height: 12px;
+    background-image: url("img/close-button.png");
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 15;
+    filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, 0.5));
+}
+
+#restorebutton-icon {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -15px;
+    width: 12px;
+    height: 12px;
+    background-image: url("img/restore-up.png");
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 15;
+    filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, 0.5));
+}
+
+#minimisebutton-icon {
+    position: relative;
+    margin-top: -15px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 12px;
+    height: 12px;
+    background-image: url("img/minimise.png");
+    background-position: center;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 15;
+    filter: drop-shadow(2px 2px 1px rgba(0, 0, 0, 0.5));
+}
+
+#spacer {
+    background-color: transparent;
+    width: 6px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    vertical-align: middle;
+    -webkit-app-region: no-drag;
+    height: 22px;
+    z-index: 10;
+}
