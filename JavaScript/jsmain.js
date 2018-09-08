@@ -29,3 +29,122 @@ function restoreWindow () {
         $('#restorebutton-icon').css("background-image", "url(img/restore-down.png)");
     }
 }
+
+// Make sure links only open in external programs like Firefox, Spotify, etc ... not in main window -->
+let shell = require('electron').shell
+    document.addEventListener('click', function (event) {
+    if (event.target.tagName === 'A' && event.target.href.startsWith('http')) {
+        event.preventDefault()
+        shell.openExternal(event.target.href)
+    }
+});
+
+// Dropdown stuff
+var clicking = false;
+var mousex = 0;
+var mousey = 0;
+
+function showDropdown(a) {
+    closeDropdowns();
+    
+    document.getElementById(a).style.setProperty('visibility', 'visible');
+    document.getElementById(a).style.setProperty('opacity', '1');
+
+    clicking = true;
+}
+
+//window.onclick = function(event) {
+    //checkForDropdownClose();
+//}
+
+function documentMouseDown (e) {
+    closeDropdowns ();
+    if(event.target.matches('.dropdown-content a')) {
+        return;
+    }
+
+    //console.log(event.target.classList);
+    if ((!event.target.classList.contains('dropdown') && !event.target.classList.contains('dropdown-zone')) || event.target.classList.contains('dropdown-fixed')) {
+        return;
+    }
+
+    if (!e) { e = window.event; }
+
+    if (e.pageX == null && e.clientX != null) {
+        var doc = document.documentElement, body = document.body;
+        e.pageX = e.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc.clientLeft || 0);
+        e.pageY = e.clientY + (doc && doc.scrollTop || body && body.scrollTop || 0) - (doc.clientTop || 0);
+    }
+
+    mousex = e.pageX;
+    mousey = e.pageY;
+
+    var MAX_X = document.body.clientWidth;
+    if (mousex + 160 > MAX_X) {
+        mousex = MAX_X - 160;
+    }
+
+    var dropdowns = document.getElementsByClassName('dropdown-content');
+    for (var i = 0; i < dropdowns.length; i++) {
+        var open = dropdowns[i];
+        if (!open.classList.contains('fixed-dropdown')) {
+            open.style.setProperty('left', mousex + 'px');
+            open.style.setProperty('top', mousey + 'px');
+        }
+    }
+}
+
+function checkForDropdownClose () {
+    //if(!event.target.matches('.dropdown')) {
+        if (clicking) {
+            clicking = false;
+            return;
+        }
+
+        closeDropdowns ();
+    //}
+}
+
+function closeDropdowns () {
+    var dropdowns = document.getElementsByClassName('dropdown-content');
+    var alpha = 1.0;
+
+    for (var i = 0; i < dropdowns.length; i++) {
+        var open = dropdowns[i];
+
+        open.style.setProperty('opacity', '0');
+        open.style.setProperty('visibility', 'hidden');
+    }
+}
+
+function changePointer(newVal) {
+    if (newVal) {
+        document.body.style.cursor = "pointer";
+    }
+    else {
+        document.body.style.cursor = "default";
+    }
+}
+
+// Caption bar stuff
+var ipc = require('electron').ipcRenderer;
+ipc.on('func_focus', function(e, msg) {
+    var el = document.getElementsByTagName('html')[0];
+
+    if (msg) {
+        // Set colours to normal on focus
+        el.style.setProperty("--bordercolour", "#2f2f2f");
+        el.style.setProperty("--buttonsopacity", "1");
+        document.getElementById("closebutton-normal").style.setProperty('filter', 'grayscale(0%)');
+        document.getElementById("closebutton-normal").style.setProperty('opacity', '1');
+        checkForDropdownClose();
+    }
+    else {
+        // Out of focus
+        el.style.setProperty("--bordercolour", "#222");
+        el.style.setProperty("--buttonsopacity", "0.5");
+        document.getElementById("closebutton-normal").style.setProperty('filter', 'grayscale(80%)');
+        document.getElementById("closebutton-normal").style.setProperty('opacity', '0.5');
+        checkForDropdownClose();
+    }
+});

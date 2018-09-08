@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!--TODO:
+    make list 'add on' instead of replacing.
+    move code into friggin other file
+-->
 <html>
     <head>
         <meta charset="utf-8" />
@@ -13,422 +17,10 @@
         <script type="text/javascript" src="JavaScript/lib/jquery-1.3.2.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script type="text/javascript" src="JavaScript/jsmain.js"></script>
-
-        <!-- Make sure links only open in external programs like Firefox, Spotify, etc ... not in main window -->
-        <script>
-            let shell = require('electron').shell
-                document.addEventListener('click', function (event) {
-                if (event.target.tagName === 'A' && event.target.href.startsWith('http')) {
-                    event.preventDefault()
-                    shell.openExternal(event.target.href)
-                }
-            });
-        </script>
-
-        <!-- Dropdown stuff -->
-        <script>
-            var clicking = false;
-            var mousex = 0;
-            var mousey = 0;
-
-            function showDropdown(a) {
-                closeDropdowns();
-                
-                document.getElementById(a).style.setProperty('visibility', 'visible');
-                document.getElementById(a).style.setProperty('opacity', '1');
-
-                clicking = true;
-            }
-
-            //window.onclick = function(event) {
-                //checkForDropdownClose();
-            //}
-
-            function documentMouseDown (e) {
-                closeDropdowns ();
-                if(event.target.matches('.dropdown-content a')) {
-                    return;
-                }
-
-                //console.log(event.target.classList);
-                if ((!event.target.classList.contains('dropdown') && !event.target.classList.contains('dropdown-zone')) || event.target.classList.contains('dropdown-fixed')) {
-                    return;
-                }
-
-                if (!e) { e = window.event; }
-
-                if (e.pageX == null && e.clientX != null) {
-                    var doc = document.documentElement, body = document.body;
-                    e.pageX = e.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc.clientLeft || 0);
-                    e.pageY = e.clientY + (doc && doc.scrollTop || body && body.scrollTop || 0) - (doc.clientTop || 0);
-                }
-
-                mousex = e.pageX;
-                mousey = e.pageY;
-
-                var MAX_X = document.body.clientWidth;
-                if (mousex + 160 > MAX_X) {
-                    mousex = MAX_X - 160;
-                }
-
-                var dropdowns = document.getElementsByClassName('dropdown-content');
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var open = dropdowns[i];
-                    if (!open.classList.contains('fixed-dropdown')) {
-                        open.style.setProperty('left', mousex + 'px');
-                        open.style.setProperty('top', mousey + 'px');
-                    }
-                }
-            }
-
-            function checkForDropdownClose () {
-                //if(!event.target.matches('.dropdown')) {
-                    if (clicking) {
-                        clicking = false;
-                        return;
-                    }
-
-                    closeDropdowns ();
-                //}
-            }
-
-            function closeDropdowns () {
-                var dropdowns = document.getElementsByClassName('dropdown-content');
-                var alpha = 1.0;
-
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var open = dropdowns[i];
-
-                    open.style.setProperty('opacity', '0');
-                    open.style.setProperty('visibility', 'hidden');
-                }
-            }
-
-            function changePointer(newVal) {
-                if (newVal) {
-                    document.body.style.cursor = "pointer";
-                }
-                else {
-                    document.body.style.cursor = "default";
-                }
-            }
-        </script>
-
-        <!-- Caption bar stuff -->
-        <script>
-            var ipc = require('electron').ipcRenderer;
-            ipc.on('func_focus', function(e, msg) {
-                var el = document.getElementsByTagName('html')[0];
-
-                if (msg) {
-                    // Set colours to normal on focus
-                    el.style.setProperty("--bordercolour", "#2f2f2f");
-                    el.style.setProperty("--buttonsopacity", "1");
-                    document.getElementById("closebutton-normal").style.setProperty('filter', 'grayscale(0%)');
-                    document.getElementById("closebutton-normal").style.setProperty('opacity', '1');
-                    checkForDropdownClose();
-                }
-                else {
-                    // Out of focus
-                    el.style.setProperty("--bordercolour", "#222");
-                    el.style.setProperty("--buttonsopacity", "0.5");
-                    document.getElementById("closebutton-normal").style.setProperty('filter', 'grayscale(80%)');
-                    document.getElementById("closebutton-normal").style.setProperty('opacity', '0.5');
-                    checkForDropdownClose();
-                }
-            });
-        </script>
+        <script type="text/javascript" src="JavaScript/jsradiostuff.js"></script>
 
         <!-- Used for retrieving radio info -->
         <script type="text/javascript">
-            var lastSongName = '';
-            var overflown = false;
-            var overflownElements = [];
-            var dummies = [];
-            var elements = [];
-            var dropdowns = [];
-            var scrollPos = 0;
-            var callCount = 1;
-            var elementsChanged = false;
-            
-            window.onload = function () {
-                tick();
-                setInterval(tick, 3000);
-
-                document.onmousedown = documentMouseDown;
-            };
-
-            function tick() {
-                overflowTick();
-
-                // Only do the subsequent code on every second call
-                if (callCount < 1) {
-                    callCount++;
-                    return;
-                }
-                else {
-                    callCount = 0;
-                }
-
-                // Retrieve JSON file.
-                $.getJSON('http://media.arn.com.au/XML-JSON.aspx?source=www.gold1043.com.au&feedUrl=xml/gold1043_now.xml', function (data) {
-                    // Current title
-                    var songNameCur = data.on_air.now_playing.audio.title.value;
-                    if (songNameCur != lastSongName) {
-                        lastSongName = songNameCur;
-                    }
-                    else {
-                        // Return if song title is still the same - Don't need to change the list.
-                        return;
-                    }
-
-                    // Clear overflown elements
-                    overflownElements = [];
-                    // Clear dummies
-                    dummies = [];
-                    // Clear regular elements
-                    elements = [];
-                    // Clear all dropdowns
-                    dropdowns = [];
-                    document.getElementById('dropdown-container').innerHTML = '';
-
-                    // Live artist name and song name from JSON file.
-                    var current = `${data.on_air.now_playing.audio.artist.value} - ${data.on_air.now_playing.audio.title.value}`;
-
-                    // Clear schedule children.
-                    document.getElementById('schedule-main').innerHTML = '';
-
-                    // Create the main live node.
-                    CreateLiveNode(current);
-
-                    // Array of previously played tracks from JSON.
-                    var previousArray = data.on_air.previously_played.audio;
-                    for (var i = 0; i < previousArray.length; i++) {
-                        var val = previousArray[i].artist.value;
-
-                        // 'Gold 104.3' isn't a song !
-                        if (val != 'Gold 104.3') {
-                            var timeRaw = previousArray[i].played_datetime.value;
-                            var timePlayed = timeRaw.substring(11, timeRaw.length).substring(0, 5);
-                            var prevString = val + ' - ' + previousArray[i].title.value;
-
-                            // Create node.
-                            CreateRegularNode(prevString, timePlayed, i);
-                        }
-                    }
-                    
-                    // Make true so overflow tick will execute.
-                    elementsChanged = true;
-                });
-            }
-
-            function CreateLiveNode (songName) {
-                songName = correctSpellingMistakes(songName);
-                var accentedSongName = correctLetterAccents (songName);
-
-                var live = document.createElement('div');
-                live.textContent = '';
-                live.setAttribute('class', 'schedule-item acrylic dropdown');
-                live.setAttribute('id', 'schedule-live');
-                live.setAttribute('onclick', 'showDropdown(\'DROPDOWN_LIVE\')');
-                live.setAttribute('onmouseover', 'changePointer(true);');
-                live.setAttribute('onmouseleave', 'changePointer(false);');
-
-                var liveTime = document.createElement('div');
-                liveTime.setAttribute('id', 'schedule-time');
-                liveTime.setAttribute('style', 'background-image: url(img/time-live.png)');
-                liveTime.setAttribute('class', 'dropdown-zone');
-                live.appendChild(liveTime);
-
-                var liveTimeSpan = document.createElement('span');
-                liveTimeSpan.textContent = 'LIVE';
-                liveTimeSpan.setAttribute('class', 'dropdown-zone');
-                liveTime.appendChild(liveTimeSpan);
-
-                var liveText = document.createElement('div');
-                liveText.setAttribute('id', 'schedule-text');
-                liveText.setAttribute('class', 'dropdown-zone');
-                live.appendChild(liveText);
-
-                var textA = document.createElement('a');
-                textA.textContent = accentedSongName;
-                textA.setAttribute('class', 'dropdown-zone');
-                liveText.appendChild(textA);
-
-                // When adding dropdown make sure the songName != 'Gold 104.3 - Better Music and More of It'
-                // Dropdown menu
-                if (songName != 'Gold 104.3 - Better Music and More of It') {
-                    var dropdown = document.createElement('div');
-                    dropdown.setAttribute('id', 'DROPDOWN_LIVE');
-                    dropdown.setAttribute('class', 'dropdown-content');
-
-                    var spotifyLink = document.createElement('a');
-                    spotifyLink.href = "spotify:search:" + escape(songName);
-                    spotifyLink.textContent = "Open in Spotify";
-                    dropdown.appendChild(spotifyLink);
-                    var ytLink = document.createElement('a');
-                    ytLink.href = "https://www.youtube.com/results?search_query=" + escape(songName);
-                    ytLink.textContent = "Open in YouTube";
-                    dropdown.appendChild(ytLink);
-                    var goLink = document.createElement('a');
-                    goLink.href = "https://www.google.com/search?q=" + escape(songName);
-                    goLink.textContent = "Google this Song";
-                    dropdown.appendChild(goLink);
-
-                    document.getElementById('dropdown-container').appendChild(dropdown);
-                }
-
-                var multiplyOverlay = document.createElement('div');
-                multiplyOverlay.setAttribute('id', 'multiply-active');
-                multiplyOverlay.setAttribute('class', 'dropdown-zone');
-                live.appendChild(multiplyOverlay);
-
-                var glossOverlay = document.createElement('div');
-                glossOverlay.setAttribute('id', 'gloss-overlay-live');
-                glossOverlay.setAttribute('class', 'dropdown-zone');
-                live.appendChild(glossOverlay);
-
-                var addOverlay = document.createElement('div');
-                addOverlay.setAttribute('id', 'additional-active');
-                addOverlay.setAttribute('class', 'dropdown-zone');
-                glossOverlay.appendChild(addOverlay);
-
-                var dummy = document.createElement('div');
-                dummy.setAttribute('id', 'schedule-text-dummy');
-                dummy.textContent = accentedSongName;
-                liveText.appendChild(dummy);
-
-                // Add dummy and corresponding text to arrays.
-                dummies.push(dummy);
-                elements.push(liveText);
-
-                document.getElementById('schedule-main').appendChild(live);
-            }
-
-            function CreateRegularNode (songName, timePlayed, idx) {
-                songName = correctSpellingMistakes(songName);
-
-                var reg = document.createElement('div');
-                reg.textContent = '';
-                reg.setAttribute('class', 'schedule-item acrylic dropdown');
-                reg.setAttribute('onclick', 'showDropdown(\'DROPDOWN_' + idx + '\')');
-                reg.setAttribute('onmouseover', 'changePointer(true);');
-                reg.setAttribute('onmouseleave', 'changePointer(false);');
-
-                var regTime = document.createElement('div');
-                regTime.setAttribute('id', 'schedule-time');
-                regTime.setAttribute('class', 'dropdown-zone');
-                reg.appendChild(regTime);
-
-                var regTimeSpan = document.createElement('span');
-                regTimeSpan.textContent = timePlayed;
-                regTimeSpan.setAttribute('class', 'dropdown-zone');
-                regTime.appendChild(regTimeSpan);
-
-                var regText = document.createElement('div');
-                regText.setAttribute('id', 'schedule-text');
-                regText.setAttribute('class', 'dropdown-zone');
-                reg.appendChild(regText);
-
-                // Actual text
-                var textA = document.createElement('a');
-                textA.textContent = correctLetterAccents (songName);
-                textA.setAttribute('class', 'dropdown-zone');
-                regText.appendChild(textA);
-
-                // Dropdown menu
-                var dropdown = document.createElement('div');
-                dropdown.setAttribute('id', 'DROPDOWN_' + idx);
-                dropdown.setAttribute('class', 'dropdown-content');
-
-                var spotifyLink = document.createElement('a');
-                spotifyLink.href = "spotify:search:" + escape(songName);
-                spotifyLink.textContent = "Open in Spotify";
-                dropdown.appendChild(spotifyLink);
-                var ytLink = document.createElement('a');
-                ytLink.href = "https://www.youtube.com/results?search_query=" + escape(songName);
-                ytLink.textContent = "Open in YouTube";
-                dropdown.appendChild(ytLink);
-                var goLink = document.createElement('a');
-                goLink.href = "https://www.google.com/search?q=" + escape(songName);
-                goLink.textContent = "Google this Song";
-                dropdown.appendChild(goLink);
-
-                document.getElementById('dropdown-container').appendChild(dropdown);
-                //reg.appendChild(dropdown);
-
-                // Gloss overlay
-                var glossOverlay = document.createElement('div');
-                glossOverlay.setAttribute('id', 'gloss-overlay');
-                glossOverlay.setAttribute('class', 'dropdown-zone');
-                reg.appendChild(glossOverlay);
-
-                var dummy = document.createElement('div');
-                dummy.setAttribute('id', 'schedule-text-dummy');
-                dummy.textContent = songName;
-                regText.appendChild(dummy);
-
-                dummies.push(dummy);
-                elements.push(regText);
-
-                document.getElementById('schedule-main').appendChild(reg);
-            }
-
-            function overflowTick () {
-                // Tried to get this to only happen on element change. Didn't work tho ;(
-                overflown = false;
-
-                // Check if overflown or not.
-                for (var i = 0; i < dummies.length; i++) {
-                    var wid = dummies[i].offsetWidth;
-                    if (wid > 410) {
-                        overflownElements.push(elements[i]);
-                        overflown = true;
-                    }
-                }
-
-                if (!overflown) { return; console.log('not overflown'); }
-
-                // Scroll overflown text left and right.
-                if (scrollPos == 0) {
-                    // Scroll right
-                    for (var i = 0; i < overflownElements.length; i++) {
-                        $(overflownElements[i]).stop();
-                        $(overflownElements[i]).animate({ scrollLeft: -(overflownElements[i].offsetWidth) }, 4000, 'linear');
-                    }
-
-                    scrollPos = 1;
-                    return;
-                }
-                else {
-                    // Scroll left
-                    for (var i = 0; i < overflownElements.length; i++) {
-                        $(overflownElements[i]).stop();
-                        $(overflownElements[i]).animate({ scrollLeft: (overflownElements[i].offsetWidth) }, 4000, 'linear');
-                    }
-                    scrollPos = 0;
-                    return;
-                }
-            }
-
-            // Gold 104.3 has a couple of songs with mis-spelt names. (The pricks there can't spell for shit) This corrects them in the display.
-            // (Probably not a complete list, but the ones I noticed are here: )
-            function correctSpellingMistakes(song) {
-                if (song == 'Kim Wilde - Chequred Love') { return 'Kim Wilde - Chequered Love'; }
-                if (song == 'Nena - 99 Luftballoons') { return 'Nena - 99 Luftballons' }
-                if (song == 'Billy Ocean - When The Going Gets Tough, The Tough Ge') { return 'Billy Ocean - When the Going Gets Tough, the Tough Get Going';}
-                if (song == 'Thompson Twins - Doctor, Doctor') return 'Thompson Twins - Doctor! Doctor!';
-                if (song == 'Sonia Dada - You Don\'t Treat Me No Good*') return 'Sonia Dada - (Lover) You Don\'t Treat Me No Good';
-                if (song == 'Trio - Da Da Da') return 'Trio - Da da da, ich lieb\' dich nicht du liebst mich nicht aha aha aha';
-                return song;
-            }
-
-            // For songs/artists that have accents in their name. Is seperate because there were bugs when using these names in links.
-            function correctLetterAccents (song) {
-                if (song.substring(0, 11) == 'Motley Crue') { return ('Mötley Crüe' + song.substring(11, song.length)); }
-                return song;
-            }
-
             // On click of context menus here:
             function exitApplication () {
                 closeDropdowns();
@@ -450,6 +42,8 @@
                 closeDropdowns();
                 console.log('about');
             }
+
+            // // // // TODO: MOVE ALL THIS GODDAMN JAVASCRIPT TO EXTERNAL FILE // // // //
         </script>
     </head>
     <body>
@@ -548,6 +142,16 @@
             <div id="dropdown-container">
                 <!-- Container for context menu's -->
             </div>
+
+            <div id="footer-content" class="acrylic">
+                <div id="gloss-overlay-static"></div>
+                <div id="footer-info-icon"></div>
+                <p>Tip: Clicking on songs will open a context-menu allowing you to view your favourite songs in Spotify, YouTube, and more !</p>
+            </div>
+            <a href="https://mikejzx.github.io" id="footer-text" class="tooltip">
+                https://mikejzx.github.io
+                <span class="tooltiptext" style="text-align: left">https://mikejzx.github.io<br>My website.<br><b>Click to follow link</b></span>
+            </a>
         </div>
     </body>
 </html>

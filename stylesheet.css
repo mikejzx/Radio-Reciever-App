@@ -157,7 +157,7 @@ header {
 }
 
 #contentarea {
-    margin: 60px 30px 0 30px;
+    margin: 80px 30px 0 30px;
 }
 
 input[type=text]{
@@ -174,4 +174,94 @@ input[type=text]{
 
 input[placeholder] {
     color: #999;
+}
+
+#footer-content {
+    position: relative;
+    text-align: left;
+    font-size: 12px;
+    text-decoration: none;
+    text-shadow: 2px 2px 3px #000;
+    color: #fff;
+
+    left: 50px;
+    right: 50px;
+    margin-right: 80px;
+    margin-top: 30px;
+    margin-left: -20px;
+}
+
+#footer-content p {
+    margin-left: 60px;
+    margin-right: 60px;
+    position: relative;
+    z-index: 5;
+}
+
+#footer-text {
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #fff;
+    text-decoration: none;
+    position: absolute;
+    margin-top: 30px;
+    font-size: 12px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#footer-info-icon {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    background-image: url('img/info-ylw.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-left: 15px;
+    margin-top: 10px;
+}
+
+#gloss-overlay-static {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    z-index: 1;
+
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url("img/list-default.png");
+    background-color: transparent;
+}
+
+.tooltip .tooltiptext {
+    transition: opacity 0.8s;
+    opacity: 0;
+    background-image: linear-gradient(180deg, #d8d8d8 0%, #a5bad6 100%);
+    color: #222;
+    text-align: center;
+    padding: 5px 8px;
+    border-radius: 6px;
+    position: absolute;
+    font-size: 12px;
+
+    z-index: 12;
+    top: 110%;
+    left: 50%;
+    margin-left: -60px;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+	box-shadow: 2px 2px 5px rgba(17, 17, 17, 0.7);
+	
+    border: 1px solid #767676;
+    pointer-events: none;
+}
+
+.tooltip:hover .tooltiptext {
+    transition: opacity 0.4s;
+    opacity: 1;
 }
