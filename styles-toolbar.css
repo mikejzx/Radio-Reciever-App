@@ -85,6 +85,10 @@
     overflow: hidden;
 }
 
+.dropdown-content:hover {
+    cursor: default;
+}
+
 .dropdown-fixed {
     position: relative;
 }
@@ -130,6 +134,7 @@
     transition: background-color 0.2s, outline 0.2s, text-shadow 0.2s;
     outline: 1px solid rgba(64, 64, 255, 0.5);
     text-shadow: 2px 2px 1px rgba(64, 192, 255, 0.3);
+    cursor: default;
 }
 
 #toolbar-button-container {

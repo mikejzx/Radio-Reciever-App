@@ -20,6 +20,7 @@ app.on('ready', function() {
         icon: path.join(__dirname, '/img/tb_icon-shadow.png'),
         resizable: false,
         //transparent: true,
+        title: 'Michael\'s Station Reciever Client',
     });
 
     // Load html into window

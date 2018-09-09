@@ -8,8 +8,15 @@ var scrollPos = 0;
 var callCount = 1;
 var elementsChanged = false;
 
+var songInfoList = [];
+var songTimeList = [];
+var songCoverList = [];
+var lastSongInfo = '';
+var lastSongTime = '';
+var lastSongCover = '';
+
 window.onload = function () {
-    tick();
+    firstTick();
     setInterval(tick, 3000);
 
     document.onmousedown = documentMouseDown;
@@ -31,13 +38,22 @@ function tick() {
     $.getJSON('http://media.arn.com.au/XML-JSON.aspx?source=www.gold1043.com.au&feedUrl=xml/gold1043_now.xml', function (data) {
         // Current title
         var songNameCur = data.on_air.now_playing.audio.title.value;
-        if (songNameCur != lastSongName) {
-            lastSongName = songNameCur;
-        }
-        else {
+        if (songNameCur == lastSongName) {
             // Return if song title is still the same - Don't need to change the list.
             return;
         }
+
+        // Add last song to song list.
+        songInfoList.splice(0, 0, lastSongInfo);
+        songTimeList.splice(0, 0, lastSongTime);
+        songCoverList.splice(0, 0, lastSongCover);
+
+        // Used for returning later.
+        lastSongName = songNameCur;
+        lastSongInfo = data.on_air.now_playing.audio.artist.value + " - " + data.on_air.now_playing.audio.title.value;
+        var lastSongTimeRaw = data.on_air.now_playing.audio.played_datetime.value;
+        lastSongTime = lastSongTimeRaw.substring(11, lastSongTimeRaw.length).substring(0, 5);
+        lastSongCover =  data.on_air.now_playing.audio.coverart.value;
 
         // Clear overflown elements
         overflownElements = [];
@@ -56,30 +72,53 @@ function tick() {
         document.getElementById('schedule-main').innerHTML = '';
 
         // Create the main live node.
-        CreateLiveNode(current);
+        var liveCoverUrl = data.on_air.now_playing.audio.coverart.value;
+        CreateLiveNode(current, liveCoverUrl);
 
-        // Array of previously played tracks from JSON.
-        var previousArray = data.on_air.previously_played.audio;
-        for (var i = 0; i < previousArray.length; i++) {
-            var val = previousArray[i].artist.value;
+        // Add regular nodes foreach in songList.
+        CreateNodes();
 
-            // 'Gold 104.3' isn't a song !
-            if (val != 'Gold 104.3') {
-                var timeRaw = previousArray[i].played_datetime.value;
-                var timePlayed = timeRaw.substring(11, timeRaw.length).substring(0, 5);
-                var prevString = val + ' - ' + previousArray[i].title.value;
-
-                // Create node.
-                CreateRegularNode(prevString, timePlayed, i);
-            }
-        }
-        
         // Make true so overflow tick will execute.
         elementsChanged = true;
     });
 }
 
-function CreateLiveNode (songName) {
+function CreateNodes () {
+    for (var i = 0; i < songInfoList.length; i++) {
+        CreateRegularNode(songInfoList[i], songTimeList[i], i, songCoverList[i]);
+    }
+    //CreateRegularNode('Artist Name - Very long song title that overflows the friggin thing.', '14:37', 69);
+}
+
+function firstTick () {
+    $.getJSON('http://media.arn.com.au/XML-JSON.aspx?source=www.gold1043.com.au&feedUrl=xml/gold1043_now.xml', function (data) {
+        var prev = data.on_air.previously_played.audio;
+        for (var i = 0; i < prev.length; i++) {
+            songInfoList.push(prev[i].artist.value + ' - ' + prev[i].title.value);
+            var timeRaw = prev[i].played_datetime.value;
+            songTime = timeRaw.substring(11, timeRaw.length).substring(0, 5);
+            songTimeList.push(songTime);
+            songCoverList.push(prev[i].coverart.value);
+        }
+
+        var songNameCur = data.on_air.now_playing.audio.title.value;
+        lastSongName = songNameCur;
+        lastSongInfo = data.on_air.now_playing.audio.artist.value + " - " + songNameCur;
+        var lastSongTimeRaw = data.on_air.now_playing.audio.played_datetime.value;
+        lastSongTime = lastSongTimeRaw.substring(11, lastSongTimeRaw.length).substring(0, 5);
+        lastSongCover = data.on_air.now_playing.audio.coverart.value;
+
+        document.getElementById('dropdown-container').innerHTML = '';
+        document.getElementById('schedule-main').innerHTML = '';
+        var liveCoverUrl = data.on_air.now_playing.audio.coverart.value;
+        var current = `${data.on_air.now_playing.audio.artist.value} - ${data.on_air.now_playing.audio.title.value}`;
+        CreateLiveNode(current, liveCoverUrl);
+
+        CreateNodes();
+    });
+}
+
+function CreateLiveNode (songName, coverUrl) {
     songName = correctSpellingMistakes(songName);
     var accentedSongName = correctLetterAccents (songName);
 
@@ -102,6 +141,12 @@ function CreateLiveNode (songName) {
     liveTimeSpan.setAttribute('class', 'dropdown-zone');
     liveTime.appendChild(liveTimeSpan);
 
+    // Cover art
+    var coverImg = document.createElement('div');
+    coverImg.setAttribute('id', 'schedule-cover');
+    coverImg.setAttribute('style', 'background-image: url(\'' + coverUrl + '\')');
+    live.appendChild(coverImg);
+
     var liveText = document.createElement('div');
     liveText.setAttribute('id', 'schedule-text');
     liveText.setAttribute('class', 'dropdown-zone');
@@ -119,6 +164,10 @@ function CreateLiveNode (songName) {
         dropdown.setAttribute('id', 'DROPDOWN_LIVE');
         dropdown.setAttribute('class', 'dropdown-content');
 
+        var copyLink = document.createElement('a');
+        copyLink.textContent = "Copy song name";
+        copyLink.setAttribute('onclick', `CopySongName(\'${songName}\')`);
+        dropdown.appendChild(copyLink);
         var spotifyLink = document.createElement('a');
         spotifyLink.href = "spotify:search:" + escape(songName);
         spotifyLink.textContent = "Open in Spotify";
@@ -133,6 +182,11 @@ function CreateLiveNode (songName) {
         dropdown.appendChild(goLink);
 
         document.getElementById('dropdown-container').appendChild(dropdown);
+    }
+    else {
+        // Set name to a more correct name
+        textA.textContent = 'Advertisements';
+        textA.setAttribute('style', 'color: #888');
     }
 
     var multiplyOverlay = document.createElement('div');
@@ -162,7 +216,7 @@ function CreateLiveNode (songName) {
     document.getElementById('schedule-main').appendChild(live);
 }
 
-function CreateRegularNode (songName, timePlayed, idx) {
+function CreateRegularNode (songName, timePlayed, idx, coverUrl) {
     songName = correctSpellingMistakes(songName);
 
     var reg = document.createElement('div');
@@ -182,6 +236,12 @@ function CreateRegularNode (songName, timePlayed, idx) {
     regTimeSpan.setAttribute('class', 'dropdown-zone');
     regTime.appendChild(regTimeSpan);
 
+    // Cover art
+    var coverImg = document.createElement('div');
+    coverImg.setAttribute('id', 'schedule-cover');
+    coverImg.setAttribute('style', 'background-image: url(\'' + coverUrl + '\')');
+    reg.appendChild(coverImg);
+
     var regText = document.createElement('div');
     regText.setAttribute('id', 'schedule-text');
     regText.setAttribute('class', 'dropdown-zone');
@@ -194,24 +254,39 @@ function CreateRegularNode (songName, timePlayed, idx) {
     regText.appendChild(textA);
 
     // Dropdown menu
-    var dropdown = document.createElement('div');
-    dropdown.setAttribute('id', 'DROPDOWN_' + idx);
-    dropdown.setAttribute('class', 'dropdown-content');
+    if (songName != 'Gold 104.3 - Better Music and More of It') {
+        var dropdown = document.createElement('div');
+        dropdown.setAttribute('id', 'DROPDOWN_' + idx);
+        dropdown.setAttribute('class', 'dropdown-content');
 
-    var spotifyLink = document.createElement('a');
-    spotifyLink.href = "spotify:search:" + escape(songName);
-    spotifyLink.textContent = "Open in Spotify";
-    dropdown.appendChild(spotifyLink);
-    var ytLink = document.createElement('a');
-    ytLink.href = "https://www.youtube.com/results?search_query=" + escape(songName);
-    ytLink.textContent = "Open in YouTube";
-    dropdown.appendChild(ytLink);
-    var goLink = document.createElement('a');
-    goLink.href = "https://www.google.com/search?q=" + escape(songName);
-    goLink.textContent = "Google this Song";
-    dropdown.appendChild(goLink);
+        // Copy to clip-board
+        var copyLink = document.createElement('a');
+        copyLink.textContent = "Copy song name";
+        copyLink.setAttribute('onclick', `CopySongName(\'${songName}\')`);
+        dropdown.appendChild(copyLink);
+        // Open in Spotify
+        var spotifyLink = document.createElement('a');
+        spotifyLink.href = "spotify:search:" + escape(songName);
+        spotifyLink.textContent = "Open in Spotify";
+        dropdown.appendChild(spotifyLink);
+        // Open in YouTube
+        var ytLink = document.createElement('a');
+        ytLink.href = "https://www.youtube.com/results?search_query=" + escape(songName);
+        ytLink.textContent = "Open in YouTube";
+        dropdown.appendChild(ytLink);
+        // Open in Google
+        var goLink = document.createElement('a');
+        goLink.href = "https://www.google.com/search?q=" + escape(songName);
+        goLink.textContent = "Google this Song";
+        dropdown.appendChild(goLink);
 
-    document.getElementById('dropdown-container').appendChild(dropdown);
+        document.getElementById('dropdown-container').appendChild(dropdown);
+    }
+    else {
+        // Set name to a more correct name
+        textA.textContent = 'Advertisements';
+        textA.setAttribute('style', 'color: #888');
+    }
     //reg.appendChild(dropdown);
 
     // Gloss overlay
@@ -231,6 +306,16 @@ function CreateRegularNode (songName, timePlayed, idx) {
     document.getElementById('schedule-main').appendChild(reg);
 }
 
+function CopySongName (songName) {
+    var dummyElement = document.createElement('textarea');
+    dummyElement.value = songName;
+    dummyElement.setAttribute('style', 'opacity: 0');
+    document.body.appendChild(dummyElement);
+    dummyElement.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummyElement);
+}
+
 function overflowTick () {
     // Tried to get this to only happen on element change. Didn't work tho ;(
     overflown = false;
@@ -238,13 +323,13 @@ function overflowTick () {
     // Check if overflown or not.
     for (var i = 0; i < dummies.length; i++) {
         var wid = dummies[i].offsetWidth;
-        if (wid > 410) {
+        if (wid > 410 - 10 - 32) {
             overflownElements.push(elements[i]);
             overflown = true;
         }
     }
 
-    if (!overflown) { return; console.log('not overflown'); }
+    if (!overflown) { return; }
 
     // Scroll overflown text left and right.
     if (scrollPos == 0) {
