@@ -381,6 +381,7 @@ function correctSpellingMistakes(song) {
     if (song == 'Trio - Da Da Da') return 'Trio - Da da da, ich lieb\' dich nicht du liebst mich nicht aha aha aha';
     if (song == 'Oasis - WonderWall') return 'Oasis - Wonderwall';
     if (song == 'Blondie - One Way Or Another') return 'Blondie - One Way or Another';
+    if (song == 'Live - Lightning Crashes (radio edit)') return 'Live - Lightning Crashes (Radio Edit)';
     if (song.substring(0, 4) == 'A,Ha') return ('A-ha' + song.substring(4, song.length));
     if (song.substring(0, 11) == 'Cranberries') return ('The Cranberries' + song.substring(11, song.length)); // Even though I can't stand this band, I  still decided I'd add them to the list.
     if (song.substring(0, 7) == 'Bangles') return ('The Bangles' + song.substring(7, song.length));
