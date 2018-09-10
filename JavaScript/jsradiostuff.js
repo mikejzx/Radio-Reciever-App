@@ -87,7 +87,11 @@ function CreateNodes () {
     for (var i = 0; i < songInfoList.length; i++) {
         CreateRegularNode(songInfoList[i], songTimeList[i], i, songCoverList[i]);
     }
+
     //CreateRegularNode('Artist Name - Very long song title that overflows the friggin thing.', '14:37', 69);
+    //CreateRegularNode('Cranberries - Zombie', '2:36', 6969);
+    //CreateRegularNode('A,Ha - Take On Me', 'Test', 6970);
+    //CreateRegularNode('Frankie Goes To Hollywood - Relax (Come Fighting)', 'Test', 6971);
 }
 
 function firstTick () {
@@ -114,6 +118,12 @@ function firstTick () {
         var current = `${data.on_air.now_playing.audio.artist.value} - ${data.on_air.now_playing.audio.title.value}`;
         CreateLiveNode(current, liveCoverUrl);
 
+        // For testing the advertisement bullshit.
+        //lastSongName = 'Better Music and More of It';
+        //lastSongInfo = 'Gold 104.3 - Better Music and More of It';
+        //lastSongTime = '69:69';
+        //CreateLiveNode('Gold 104.3 - Better Music and More of It', liveCoverUrl);
+
         CreateNodes();
     });
 }
@@ -126,7 +136,9 @@ function CreateLiveNode (songName, coverUrl) {
     live.textContent = '';
     live.setAttribute('class', 'schedule-item acrylic dropdown');
     live.setAttribute('id', 'schedule-live');
-    live.setAttribute('onclick', 'showDropdown(\'DROPDOWN_LIVE\')');
+    if (songName != 'Gold 104.3 - Better Music and More of It') {
+        live.setAttribute('onclick', 'showDropdown(\'DROPDOWN_LIVE\')');
+    }
     live.setAttribute('onmouseover', 'changePointer(true);');
     live.setAttribute('onmouseleave', 'changePointer(false);');
 
@@ -166,7 +178,7 @@ function CreateLiveNode (songName, coverUrl) {
 
         var copyLink = document.createElement('a');
         copyLink.textContent = "Copy song name";
-        copyLink.setAttribute('onclick', `CopySongName(\'${songName}\')`);
+        copyLink.setAttribute('onclick', 'CopySongName(\'' + escapeChars(songName) + '\')');
         dropdown.appendChild(copyLink);
         var spotifyLink = document.createElement('a');
         spotifyLink.href = "spotify:search:" + escape(songName);
@@ -222,7 +234,9 @@ function CreateRegularNode (songName, timePlayed, idx, coverUrl) {
     var reg = document.createElement('div');
     reg.textContent = '';
     reg.setAttribute('class', 'schedule-item acrylic dropdown');
-    reg.setAttribute('onclick', 'showDropdown(\'DROPDOWN_' + idx + '\')');
+    if (songName != 'Gold 104.3 - Better Music and More of It') {
+        reg.setAttribute('onclick', 'showDropdown(\'DROPDOWN_' + idx + '\')');
+    }
     reg.setAttribute('onmouseover', 'changePointer(true);');
     reg.setAttribute('onmouseleave', 'changePointer(false);');
 
@@ -262,7 +276,7 @@ function CreateRegularNode (songName, timePlayed, idx, coverUrl) {
         // Copy to clip-board
         var copyLink = document.createElement('a');
         copyLink.textContent = "Copy song name";
-        copyLink.setAttribute('onclick', `CopySongName(\'${songName}\')`);
+        copyLink.setAttribute('onclick', 'CopySongName(\'' + escapeChars(songName) + '\')');
         dropdown.appendChild(copyLink);
         // Open in Spotify
         var spotifyLink = document.createElement('a');
@@ -286,6 +300,8 @@ function CreateRegularNode (songName, timePlayed, idx, coverUrl) {
         // Set name to a more correct name
         textA.textContent = 'Advertisements';
         textA.setAttribute('style', 'color: #888');
+        regTimeSpan.textContent = 'N/A'; // Real Time was buggy for some reason
+        regTimeSpan.setAttribute('style', 'color: #888');
     }
     //reg.appendChild(dropdown);
 
@@ -313,6 +329,7 @@ function CopySongName (songName) {
     document.body.appendChild(dummyElement);
     dummyElement.select();
     document.execCommand('copy');
+    console.log(songName);
     document.body.removeChild(dummyElement);
 }
 
@@ -362,11 +379,25 @@ function correctSpellingMistakes(song) {
     if (song == 'Thompson Twins - Doctor, Doctor') return 'Thompson Twins - Doctor! Doctor!';
     if (song == 'Sonia Dada - You Don\'t Treat Me No Good*') return 'Sonia Dada - (Lover) You Don\'t Treat Me No Good';
     if (song == 'Trio - Da Da Da') return 'Trio - Da da da, ich lieb\' dich nicht du liebst mich nicht aha aha aha';
+    if (song == 'Oasis - WonderWall') return 'Oasis - Wonderwall';
+    if (song == 'Blondie - One Way Or Another') return 'Blondie - One Way or Another';
+    if (song.substring(0, 4) == 'A,Ha') return ('A-ha' + song.substring(4, song.length));
+    if (song.substring(0, 11) == 'Cranberries') return ('The Cranberries' + song.substring(11, song.length)); // Even though I can't stand this band, I  still decided I'd add them to the list.
+    if (song.substring(0, 7) == 'Bangles') return ('The Bangles' + song.substring(7, song.length));
+    if (song.substring(0, 6) == 'Police') return ('The Police' + song.substring(6, song.length));
+    if (song.substring(0, 25) == 'Frankie Goes To Hollywood') return ('Frankie Goes to Hollywood' + song.substring(25, song.length));
     return song;
 }
 
 // For songs/artists that have accents in their name. Is seperate because there were bugs when using these names in links.
 function correctLetterAccents (song) {
     if (song.substring(0, 11) == 'Motley Crue') { return ('Mötley Crüe' + song.substring(11, song.length)); }
+    if (song.substring(0, 15) == 'Sinead O\'Connor') { return ('Sinéad O\'Connor' + song.substring(15, song.length)); }
     return song;
+}
+
+function escapeChars(text) {
+   var quoted = text.replace(/"/g, '\\"');
+   var slashed = quoted.replace(/\\/g, '\\');
+   return slashed.replace(/'/g, '\\\'');
 }
