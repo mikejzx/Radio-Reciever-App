@@ -382,11 +382,16 @@ function correctSpellingMistakes(song) {
     if (song == 'Oasis - WonderWall') return 'Oasis - Wonderwall';
     if (song == 'Blondie - One Way Or Another') return 'Blondie - One Way or Another';
     if (song == 'Live - Lightning Crashes (radio edit)') return 'Live - Lightning Crashes (Radio Edit)';
+    if (song == 'Dragon - April Sun In Cuba') return 'Dragon - April Sun in Cuba';
+    if (song == 'Chris DeBurgh - Don\'t Pay The Ferryman') return 'Chris de Burgh - Don\'t Pay the Ferryman';
     if (song.substring(0, 4) == 'A,Ha') return ('A-ha' + song.substring(4, song.length));
     if (song.substring(0, 11) == 'Cranberries') return ('The Cranberries' + song.substring(11, song.length)); // Even though I can't stand this band, I  still decided I'd add them to the list.
     if (song.substring(0, 7) == 'Bangles') return ('The Bangles' + song.substring(7, song.length));
     if (song.substring(0, 6) == 'Police') return ('The Police' + song.substring(6, song.length));
     if (song.substring(0, 25) == 'Frankie Goes To Hollywood') return ('Frankie Goes to Hollywood' + song.substring(25, song.length));
+    if (song.substring(0, 8) == 'Swingers') return ('The Swingers' + song.substring(8, song.length));
+    if (song.substring(0, 13) == 'Chris DeBurgh') return ('Chris de Burgh' + song.substring(13, song.length));
+    if (song.substring(0, 20) == 'Mike & The Mechanics') return ('Mike + The Mechanics' + song.substring(20, song.length));
     return song;
 }
 
