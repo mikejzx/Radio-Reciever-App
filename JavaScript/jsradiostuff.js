@@ -92,6 +92,8 @@ function CreateNodes () {
     //CreateRegularNode('Cranberries - Zombie', '2:36', 6969);
     //CreateRegularNode('A,Ha - Take On Me', 'Test', 6970);
     //CreateRegularNode('Frankie Goes To Hollywood - Relax (Come Fighting)', 'Test', 6971);
+    //CreateRegularNode('B,52\'s - Roam', '69:69', 6972);
+    //CreateRegularNode('Deee,Lite - Groove Is In The Heart', '69:69', 6973);
 }
 
 function firstTick () {
@@ -384,6 +386,8 @@ function correctSpellingMistakes(song) {
     if (song == 'Live - Lightning Crashes (radio edit)') return 'Live - Lightning Crashes (Radio Edit)';
     if (song == 'Dragon - April Sun In Cuba') return 'Dragon - April Sun in Cuba';
     if (song == 'Chris DeBurgh - Don\'t Pay The Ferryman') return 'Chris de Burgh - Don\'t Pay the Ferryman';
+    if (song == 'Deee,Lite - Groove Is In The Heart') return 'Deee-Lite - Groove Is in the Heart';
+    if (song == 'John Parr - St Elmo\'s Fire') return 'John Parr - St. Elmo\'s Fire (Man in Motion)';
     if (song.substring(0, 4) == 'A,Ha') return ('A-ha' + song.substring(4, song.length));
     if (song.substring(0, 11) == 'Cranberries') return ('The Cranberries' + song.substring(11, song.length)); // Even though I can't stand this band, I  still decided I'd add them to the list.
     if (song.substring(0, 7) == 'Bangles') return ('The Bangles' + song.substring(7, song.length));
@@ -392,6 +396,10 @@ function correctSpellingMistakes(song) {
     if (song.substring(0, 8) == 'Swingers') return ('The Swingers' + song.substring(8, song.length));
     if (song.substring(0, 13) == 'Chris DeBurgh') return ('Chris de Burgh' + song.substring(13, song.length));
     if (song.substring(0, 20) == 'Mike & The Mechanics') return ('Mike + The Mechanics' + song.substring(20, song.length));
+    if (song.substring(0, 6) == 'B,52\'s') return ('The B-52\'s' + song.substring(6, song.length));
+    if (song.substring(0, 6) == 'Cars -') return ('The Cars -' + song.substring(6, song.length));
+    if (song.substring(0, 9) == 'Deee,Lite') return ('Deee-Lite' + song.substring(9, song.length));
+    if (song.substring(0, 7) == 'Beatles') return ('The Beatles' + song.substring(7, song.length));
     return song;
 }
 
