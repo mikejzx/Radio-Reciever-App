@@ -1,7 +1,7 @@
 
 .schedule {
     width: 520px;
-    height: 350px;
+    height: 320px; /*350px;*/
     overflow-y: scroll;
     border-radius: 6px;
     box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.5);

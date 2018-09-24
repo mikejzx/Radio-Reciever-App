@@ -1,0 +1,43 @@
+{
+   "now_on":{
+      "nid":"65507",
+      "title":"Simon Diaz",
+      "station_nid":"257",
+      "frequency":"91.5 FM",
+      "large_fid":null,
+      "small_fid":"393562",
+      "thumb_fid":"405915",
+      "time_str":"1pm-4pm weekdays",
+      "image":"https:\/\/d2nzqyyfd6k6c7.cloudfront.net\/show\/banner-small\/1200x1200_simondiaz_0.jpg"
+   },
+   "now_playing":{
+      "stid":"5785372",
+      "station":"smooth915",
+      "nova_song_id":"578",
+      "start":"1537784280",
+      "finish":"1537784280",
+      "itunes_url":"https:\/\/itunes.apple.com\/au\/album\/stars\/id273968058?i=273968069&uo=4&at=11l32DS",
+      "artist_title":"Simply Red",
+      "album_art":"https:\/\/d2nzqyyfd6k6c7.cloudfront.net\/album_art\/s\/mzi.uqinzabp.400x400-75.jpg",
+      "song_title":"Stars",
+      "album_title":"Stars"
+   }
+   
+   LINK https://www.smooth.com.au/smooth/ajax/media_bar/smooth915?ajax_ts=1537765653061
+   
+  // Get our show and our 'now playing';
+  now = Date.now();
+  path = '/smooth/ajax/media_bar/' + station + '?ajax_ts=' + Date.now();
+
+  $.getJSON(path, function(data) {
+	// TODO, finish this.
+	if (data.now_on != null) {
+	  $('.smooth-media-bar-on-air-img').attr('src', data.now_on.image);
+	  $('.smooth-media-bar-on-air-now-title').html(data.now_on.title);
+	}
+	if (data.now_playing != null) {
+	  $('.smooth-media-bar-now-playing-img').attr('src', data.now_playing.album_art);
+	  $('.smooth-media-bar-now-playing-track>a').html(data.now_playing.song_title);
+	  $('.smooth-media-bar-now-playing-artist>a').html(data.now_playing.artist_title);
+	}
+}

@@ -14,6 +14,8 @@ var songCoverList = [];
 var lastSongInfo = '';
 var lastSongTime = '';
 var lastSongCover = '';
+var prevSongName = 'Loading...';
+var prevArtistName = 'Loading...';
 
 window.onload = function () {
     firstTick();
@@ -33,6 +35,8 @@ function tick() {
     else {
         callCount = 0;
     }
+
+    // SmoothFM: https://www.smooth.com.au/smooth/ajax/media_bar/smooth915?ajax_ts=1537765293778
 
     // Retrieve JSON file.
     $.getJSON('http://media.arn.com.au/XML-JSON.aspx?source=www.gold1043.com.au&feedUrl=xml/gold1043_now.xml', function (data) {
@@ -74,12 +78,22 @@ function tick() {
         // Create the main live node.
         var liveCoverUrl = data.on_air.now_playing.audio.coverart.value;
         CreateLiveNode(current, liveCoverUrl);
+        SetPlayer(data.on_air.now_playing.audio.title.value, data.on_air.now_playing.audio.artist.value, liveCoverUrl);
+
+        // Create the next node if applicable
+        var nextName = `${data.on_air.up_next.audio[0].artist.value} - ${data.on_air.up_next.audio[0].title.value}`;
+        var nextCoverUrl = data.on_air.up_next.audio[0].coverart.value;
+        CreateUpnextNode(nextName, nextCoverUrl);
 
         // Add regular nodes foreach in songList.
         CreateNodes();
 
         // Make true so overflow tick will execute.
         elementsChanged = true;
+
+        // Animate player-text.
+        //$('player-title-text').stop();
+        //$('player-title-text').animate({ opacity: 0.0 }, 4000, 'linear');
     });
 }
 
@@ -119,6 +133,11 @@ function firstTick () {
         var liveCoverUrl = data.on_air.now_playing.audio.coverart.value;
         var current = `${data.on_air.now_playing.audio.artist.value} - ${data.on_air.now_playing.audio.title.value}`;
         CreateLiveNode(current, liveCoverUrl);
+        SetPlayer(data.on_air.now_playing.audio.title.value, data.on_air.now_playing.audio.artist.value, liveCoverUrl);
+
+        var nextName = `${data.on_air.up_next.audio[0].artist.value} - ${data.on_air.up_next.audio[0].title.value}`;
+        var nextCoverUrl = data.on_air.up_next.audio[0].coverart.value;
+        CreateUpnextNode(nextName, nextCoverUrl);
 
         // For testing the advertisement bullshit.
         //lastSongName = 'Better Music and More of It';
@@ -324,6 +343,62 @@ function CreateRegularNode (songName, timePlayed, idx, coverUrl) {
     document.getElementById('schedule-main').appendChild(reg);
 }
 
+function CreateUpnextNode (songName, coverUrl) {
+    if (songName == 'Gold 104.3 - Better Music and More of It') { return; }
+
+    songName = correctSpellingMistakes(songName);
+    var accentedSongName = correctLetterAccents (songName);
+
+    var unext = document.createElement('div');
+    unext.textContent = '';
+    unext.setAttribute('class', 'schedule-item acrylic dropdown');
+    unext.setAttribute('onmouseover', 'changePointer(true);');
+    unext.setAttribute('onmouseleave', 'changePointer(false);');
+
+    var unextTime = document.createElement('div');
+    unextTime.setAttribute('id', 'schedule-time');
+    unextTime.setAttribute('style', 'background-image: url(img/time-next.png)');
+    unextTime.setAttribute('class', 'dropdown-zone');
+    unext.appendChild(unextTime);
+
+    var unextTimeSpan = document.createElement('span');
+    unextTimeSpan.textContent = 'Next';
+    unextTimeSpan.setAttribute('class', 'dropdown-zone');
+    unextTime.appendChild(unextTimeSpan);
+
+    // Cover art
+    var coverImg = document.createElement('div');
+    coverImg.setAttribute('id', 'schedule-cover');
+    coverImg.setAttribute('style', 'background-image: url(\'' + coverUrl + '\')');
+    unext.appendChild(coverImg);
+
+    var unextText = document.createElement('div');
+    unextText.setAttribute('id', 'schedule-text');
+    unextText.setAttribute('class', 'dropdown-zone');
+    unext.appendChild(unextText);
+
+    var textA = document.createElement('a');
+    textA.textContent = accentedSongName;
+    textA.setAttribute('class', 'dropdown-zone');
+    unextText.appendChild(textA);
+
+    var glossOverlay = document.createElement('div');
+    glossOverlay.setAttribute('id', 'gloss-overlay');
+    glossOverlay.setAttribute('class', 'dropdown-zone');
+    unext.appendChild(glossOverlay);
+
+    var dummy = document.createElement('div');
+    dummy.setAttribute('id', 'schedule-text-dummy');
+    dummy.textContent = accentedSongName;
+    unextText.appendChild(dummy);
+
+    // Add dummy and corresponding text to arrays.
+    dummies.push(dummy);
+    elements.push(unextText);
+
+    document.getElementById('schedule-main').appendChild(unext);
+}
+
 function CopySongName (songName) {
     var dummyElement = document.createElement('textarea');
     dummyElement.value = songName;
@@ -388,6 +463,9 @@ function correctSpellingMistakes(song) {
     if (song == 'Chris DeBurgh - Don\'t Pay The Ferryman') return 'Chris de Burgh - Don\'t Pay the Ferryman';
     if (song == 'Deee,Lite - Groove Is In The Heart') return 'Deee-Lite - Groove Is in the Heart';
     if (song == 'John Parr - St Elmo\'s Fire') return 'John Parr - St. Elmo\'s Fire (Man in Motion)';
+    if (song == 'Journey - Don\'t Stop Believin') return 'Journey - Don\'t Stop Believin\'';
+    if (song == 'INXS - JUST KEEP WALKING') return 'INXS - Just Keep Walking';
+    if (song == 'Run DMC and Aerosmith - Walk This Way') return 'Run-D.M.C. & Aerosmith - Walk This Way';
     if (song.substring(0, 4) == 'A,Ha') return ('A-ha' + song.substring(4, song.length));
     if (song.substring(0, 11) == 'Cranberries') return ('The Cranberries' + song.substring(11, song.length)); // Even though I can't stand this band, I  still decided I'd add them to the list.
     if (song.substring(0, 7) == 'Bangles') return ('The Bangles' + song.substring(7, song.length));
@@ -400,6 +478,8 @@ function correctSpellingMistakes(song) {
     if (song.substring(0, 6) == 'Cars -') return ('The Cars -' + song.substring(6, song.length));
     if (song.substring(0, 9) == 'Deee,Lite') return ('Deee-Lite' + song.substring(9, song.length));
     if (song.substring(0, 7) == 'Beatles') return ('The Beatles' + song.substring(7, song.length));
+    if (song.substring(0, 5) == 'Knack') return ('The Knack' + song.substring(5, song.length));
+    if (song.substring(0, 12) == 'Guns n Roses') return ('Guns N\' Roses' + song.substring(12, song.length));
     return song;
 }
 
@@ -415,3 +495,73 @@ function escapeChars(text) {
    var slashed = quoted.replace(/\\/g, '\\');
    return slashed.replace(/'/g, '\\\'');
 }
+
+function SetPlayer(songN, artistN, coverUrl) {
+    var combined = artistN + ' - ' + songN;
+    var corrected = correctLetterAccents(correctSpellingMistakes(combined));
+    var hyphen = -1;
+    for (var i = 0; i < corrected.length; i++) {
+        if (corrected[i] == '-' && i - 1 > -1 && i + 1 < corrected.length && corrected[i - 1] == ' ' && corrected[i + 1] == ' ') {
+            hyphen = i;
+            console.log('hyphen = ' + hyphen);
+        }
+    }
+    var artistName = corrected.substring(0, hyphen);
+    var songName = corrected.substring(hyphen + 2, corrected.length);
+
+    //document.getElementById('current-bottom').setAttribute('style', 'background-image: url(\'' + coverUrl + '\')');
+    document.getElementById('current-bottom').pseudoStyle('before', 'background-image', 'url(\'' + coverUrl + '\')');
+    document.getElementById('current-bottom').innerHTML = '';
+    var cont = document.createElement('div');
+    cont.setAttribute('id', 'player-text-container');
+    document.getElementById('current-bottom').appendChild(cont);
+
+    var spanA = document.createElement('div');
+    spanA.textContent = prevSongName;
+    spanA.setAttribute('style', 'margin-top: 7px');
+    cont.appendChild(spanA);
+
+    var spanB = document.createElement('div');
+    spanB.innerHTML = prevArtistName;
+    spanB.setAttribute('style', 'margin-top: 6px; font-size: 13px; color: #ccc;');
+    cont.appendChild(spanB);
+
+    var spanC = document.createElement('div');
+    spanC.textContent = 'Currently Playing Song on Gold 104.3';
+    spanC.setAttribute('style', 'margin-top: 6px; font-size: 10px; color: #ccc;');
+    document.getElementById('current-bottom').appendChild(spanC);
+
+    $('#player-text-container').stop();
+    $('#player-text-container').animate({'opacity': 0}, 1000, function() {
+        spanA.textContent = songName;
+        spanB.textContent = artistName;
+    }).animate({'opacity': 1}, 1000);
+
+    prevSongName = songName;
+    prevArtistName = artistName;
+}
+
+// Lib-code for pseudo-style-editing
+(function() {
+    a = {
+        _b: 0,
+        c: function() {
+            this._b++;
+            return this.b;
+        }
+    };
+    HTMLElement.prototype.pseudoStyle = function(d, e, f) {
+        var g = "pseudoStyles";
+        var h = document.head || document.getElementsByTagName('head')[0];
+        var i = document.getElementById(g) || document.createElement('style');
+        i.id = g;
+        var j = "pseudoStyle" + a.c();
+        if (!this.classList.contains(j)) {
+            this.className += " " + j;
+            console.log('Adding pseudoStyle to class list');
+        }
+        i.innerHTML += " ." + j + ":" + d + "{" + e + ":" + f + "}";
+        h.appendChild(i);
+        return this;
+    };
+})();

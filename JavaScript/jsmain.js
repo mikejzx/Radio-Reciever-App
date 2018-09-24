@@ -148,3 +148,28 @@ ipc.on('func_focus', function(e, msg) {
         checkForDropdownClose();
     }
 });
+
+// On click of context menus here:
+function exitApplication () {
+    closeDropdowns();
+    console.log('exit');
+
+    window.close();
+}
+
+function openDevTools () {
+    closeDropdowns();
+    console.log('dev tools');
+
+    const rem = require('electron').remote;
+    var wnd = rem.getCurrentWindow();
+    wnd.webContents.openDevTools();
+}
+
+function openAboutWindow () {
+    closeDropdowns();
+    console.log('about');
+
+    let { remote } = require('electron');
+    remote.getGlobal("createAboutWindow")();
+}
