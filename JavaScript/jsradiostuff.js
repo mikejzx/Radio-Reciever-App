@@ -151,7 +151,12 @@ function firstTick () {
 
 function CreateLiveNode (songName, coverUrl) {
     songName = correctSpellingMistakes(songName);
-    var accentedSongName = correctLetterAccents (songName);
+    var finalSongName = correctLetterAccents (songName);
+
+    // Show balloon tip to indicate that it's changed especially if it's minimised
+    // (Not actually related to the live node at all)
+    let {remote} = require('electron');
+    remote.getGlobal('showBalloon')(finalSongName);
 
     var live = document.createElement('div');
     live.textContent = '';
@@ -186,7 +191,7 @@ function CreateLiveNode (songName, coverUrl) {
     live.appendChild(liveText);
 
     var textA = document.createElement('a');
-    textA.textContent = accentedSongName;
+    textA.textContent = finalSongName;
     textA.setAttribute('class', 'dropdown-zone');
     liveText.appendChild(textA);
 
@@ -239,7 +244,7 @@ function CreateLiveNode (songName, coverUrl) {
 
     var dummy = document.createElement('div');
     dummy.setAttribute('id', 'schedule-text-dummy');
-    dummy.textContent = accentedSongName;
+    dummy.textContent = finalSongName;
     liveText.appendChild(dummy);
 
     // Add dummy and corresponding text to arrays.
@@ -347,7 +352,7 @@ function CreateUpnextNode (songName, coverUrl) {
     if (songName == 'Gold 104.3 - Better Music and More of It') { return; }
 
     songName = correctSpellingMistakes(songName);
-    var accentedSongName = correctLetterAccents (songName);
+    var finalSongName = correctLetterAccents (songName);
 
     var unext = document.createElement('div');
     unext.textContent = '';
@@ -378,7 +383,7 @@ function CreateUpnextNode (songName, coverUrl) {
     unext.appendChild(unextText);
 
     var textA = document.createElement('a');
-    textA.textContent = accentedSongName;
+    textA.textContent = finalSongName;
     textA.setAttribute('class', 'dropdown-zone');
     unextText.appendChild(textA);
 
@@ -389,7 +394,7 @@ function CreateUpnextNode (songName, coverUrl) {
 
     var dummy = document.createElement('div');
     dummy.setAttribute('id', 'schedule-text-dummy');
-    dummy.textContent = accentedSongName;
+    dummy.textContent = finalSongName;
     unextText.appendChild(dummy);
 
     // Add dummy and corresponding text to arrays.
@@ -466,6 +471,14 @@ function correctSpellingMistakes(song) {
     if (song == 'Journey - Don\'t Stop Believin') return 'Journey - Don\'t Stop Believin\'';
     if (song == 'INXS - JUST KEEP WALKING') return 'INXS - Just Keep Walking';
     if (song == 'Run DMC and Aerosmith - Walk This Way') return 'Run-D.M.C. & Aerosmith - Walk This Way';
+    if (song == 'The Go,Betweens - Streets Of Your Town') return 'The Go-Betweens - Streets of Your Town';
+    if (song == 'M - Pop Muzic') return 'M - Pop Muzik';
+    if (song == 'Kiss - Rock And Roll All Nite') return 'Rock and Roll All Nite';
+    if (song == 'Whitney Houston - I Wanna Dance With Somebody') return 'Whitney Houston - I Wanna Dance with Somebody (Who Loves Me)';
+    if (song == 'Inner Circle - Sweat (a la la la la long)') return 'Inner Circle - Sweat (A La La La La Long)';
+    if (song == 'Matchbox Twenty - 3am') return 'Matchbox Twenty - 3AM';
+    if (song == 'Philip Oakey & Giorgio Moroder - Together In Electric Dreams') return 'Philip Oakey & Giorgio Moroder - Together in Electric Dreams';
+    if (song == 'The Offspring - Pretty Fly For A Whiteguy') return 'The Offspring - Pretty Fly (For a White Guy)';
     if (song.substring(0, 4) == 'A,Ha') return ('A-ha' + song.substring(4, song.length));
     if (song.substring(0, 11) == 'Cranberries') return ('The Cranberries' + song.substring(11, song.length)); // Even though I can't stand this band, I  still decided I'd add them to the list.
     if (song.substring(0, 7) == 'Bangles') return ('The Bangles' + song.substring(7, song.length));
@@ -480,6 +493,17 @@ function correctSpellingMistakes(song) {
     if (song.substring(0, 7) == 'Beatles') return ('The Beatles' + song.substring(7, song.length));
     if (song.substring(0, 5) == 'Knack') return ('The Knack' + song.substring(5, song.length));
     if (song.substring(0, 12) == 'Guns n Roses') return ('Guns N\' Roses' + song.substring(12, song.length));
+    if (song.substring(0, 12) == 'Human League') return ('The Human League' + song.substring(12, song.length));
+    if (song.substring(0, 15) == 'The Go,Betweens') return ('The Go-Betweens' + song.substring(15, song.length));
+    if (song.substring(0, 8) == 'Tone Loc') return ('Tone Lōc' + song.substring(8, song.length));
+    song = checkArtistName(song, 'The Presidents Of The Usa', 'The Presidents of the USA');
+    song = checkArtistName(song, 'Run DMC', 'Run D.M.C.');
+    song = checkArtistName(song, 'Corrs', 'The Corrs');
+    return song;
+}
+
+function checkArtistName (song, err, fix) {
+    if (song.substring(0, err.length) == err) { return fix + song.substring(err.length, song.length); }
     return song;
 }
 
@@ -503,39 +527,20 @@ function SetPlayer(songN, artistN, coverUrl) {
     for (var i = 0; i < corrected.length; i++) {
         if (corrected[i] == '-' && i - 1 > -1 && i + 1 < corrected.length && corrected[i - 1] == ' ' && corrected[i + 1] == ' ') {
             hyphen = i;
-            console.log('hyphen = ' + hyphen);
+            //console.log('hyphen = ' + hyphen);
         }
     }
-    var artistName = corrected.substring(0, hyphen);
+    var artistName = corrected.substring(0, hyphen - 1);
     var songName = corrected.substring(hyphen + 2, corrected.length);
 
     //document.getElementById('current-bottom').setAttribute('style', 'background-image: url(\'' + coverUrl + '\')');
     document.getElementById('current-bottom').pseudoStyle('before', 'background-image', 'url(\'' + coverUrl + '\')');
-    document.getElementById('current-bottom').innerHTML = '';
-    var cont = document.createElement('div');
-    cont.setAttribute('id', 'player-text-container');
-    document.getElementById('current-bottom').appendChild(cont);
-
-    var spanA = document.createElement('div');
-    spanA.textContent = prevSongName;
-    spanA.setAttribute('style', 'margin-top: 7px');
-    cont.appendChild(spanA);
-
-    var spanB = document.createElement('div');
-    spanB.innerHTML = prevArtistName;
-    spanB.setAttribute('style', 'margin-top: 6px; font-size: 13px; color: #ccc;');
-    cont.appendChild(spanB);
-
-    var spanC = document.createElement('div');
-    spanC.textContent = 'Currently Playing Song on Gold 104.3';
-    spanC.setAttribute('style', 'margin-top: 6px; font-size: 10px; color: #ccc;');
-    document.getElementById('current-bottom').appendChild(spanC);
 
     $('#player-text-container').stop();
     $('#player-text-container').animate({'opacity': 0}, 1000, function() {
-        spanA.textContent = songName;
-        spanB.textContent = artistName;
-    }).animate({'opacity': 1}, 1000);
+        document.getElementById('player-title').textContent = songName;
+        document.getElementById('player-artist').textContent = artistName;
+    }).animate({'opacity': 1}, 2000);
 
     prevSongName = songName;
     prevArtistName = artistName;

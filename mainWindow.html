@@ -18,6 +18,7 @@
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script type="text/javascript" src="JavaScript/jsmain.js"></script>
         <script type="text/javascript" src="JavaScript/jsradiostuff.js"></script>
+        <script type="text/javascript" src="JavaScript/jscomm.js"></script>
     </head>
     <body>
         <header>
@@ -42,7 +43,7 @@
             </div>
         </header>
 
-        <!-- <div id="header-left">Put like an icon here or something</div>-->
+        <div id="header-left"></div>
 
         <div id="toolbar">
             <div class="toolbar-button dropdown-fixed" onclick="showDropdown('dropdown-misc')">
@@ -112,8 +113,14 @@
                     <div id="gloss-overlay"></div>-->
                 </div>
 
-                <div id="current-bottom"><br>
-                    Now Playing: Loading...
+                <div id="current-bottom">
+                    <div id="player-text-container">
+                        <div style="margin-top: 7px" id="player-title">Loading...</div> <!-- Song name -->
+                        <div style="margin-top: 6px; font-size: 13px; color: #ccc;" id="player-artist">Loading...</div> <!-- Artist name -->
+                    </div>
+                    <div style="margin-top: 6px; font-size: 10px; color: #ccc;">
+                        Currently Playing Song on Gold 104.3
+                    </div>
                 </div>
             </div>
             <div id="dropdown-container">

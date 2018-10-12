@@ -67,6 +67,12 @@ header {
     left: var(--paddingamount);
     right: var(--paddingamount);
     top: var(--paddingamount);
+
+    background-image: url(img/icon-grey.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-left: 8px;
+    position: absolute;
 }
 
 #headertext {

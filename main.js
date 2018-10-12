@@ -3,9 +3,10 @@ const electron = require('electron');
 const url = require('url');
 const path = require('path');
 
-const { app, BrowserWindow, Menu } = electron;
+const { app, BrowserWindow, Menu, Tray } = electron;
 let mainWindow;
 let aboutWindow;
+let tray = null;
 
 // Listen for app to be ready
 app.on('ready', function() {
@@ -52,10 +53,23 @@ app.on('ready', function() {
     mainWindow.on('blur', function () {
         mainWindow.webContents.send('func_focus', false);
     });
+
+    tray = new Tray(path.join(__dirname, '/img/tb_icon-shadow.png'));
+    tray.setToolTip('Michael\'s Radio Reciever App');
+
+    /*
+    tray.displayBalloon({
+        title: 'Now Playing On Gold 104.3',
+        content: 'Artist - Song'
+    });*/
 });
 
 // Create the 'about-window'
+var aboutWindow_visible = false;
 global.createAboutWindow = function () {
+    if (aboutWindow_visible) { return; }
+    aboutWindow_visible = true;
+
     aboutWindow = new BrowserWindow({
         frame: false,
         width: 252,
@@ -75,6 +89,7 @@ global.createAboutWindow = function () {
 
     aboutWindow.on('closed', function() {
         aboutWindow = null;
+        aboutWindow_visible = false;
     });
 
     // Gain focus
@@ -85,6 +100,14 @@ global.createAboutWindow = function () {
     // Lose focus
     aboutWindow.on('blur', function () {
         aboutWindow.webContents.send('func_focus', false);
+    });
+}
+
+global.showBalloon = function(songName) {
+    tray.displayBalloon({
+        icon: '/img/tb_icon-shadow.png',
+        title: 'Now Playing On Gold 104.3',
+        content: (songName + '\nMichael\'s Radio Reciever App!')
     });
 }
 
