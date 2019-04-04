@@ -9,6 +9,7 @@ function closeWindow () {
 }
 
 function minimiseWindow () {
+    //$('.minimise-btn').css('pointer-events', 'none');
     win.minimize();
 }
 

@@ -21,6 +21,8 @@ window.onload = function () {
     firstTick();
     setInterval(tick, 3000);
 
+    UpdateTitle('This is working?');
+
     document.onmousedown = documentMouseDown;
 };
 
@@ -58,6 +60,9 @@ function tick() {
         var lastSongTimeRaw = data.on_air.now_playing.audio.played_datetime.value;
         lastSongTime = lastSongTimeRaw.substring(11, lastSongTimeRaw.length).substring(0, 5);
         lastSongCover =  data.on_air.now_playing.audio.coverart.value;
+
+        // Update the title/window caption
+        UpdateTitle(lastSongInfo);
 
         // Clear overflown elements
         overflownElements = [];
@@ -124,6 +129,7 @@ function firstTick () {
         var songNameCur = data.on_air.now_playing.audio.title.value;
         lastSongName = songNameCur;
         lastSongInfo = data.on_air.now_playing.audio.artist.value + " - " + songNameCur;
+        UpdateTitle(lastSongInfo);
         var lastSongTimeRaw = data.on_air.now_playing.audio.played_datetime.value;
         lastSongTime = lastSongTimeRaw.substring(11, lastSongTimeRaw.length).substring(0, 5);
         lastSongCover = data.on_air.now_playing.audio.coverart.value;
@@ -147,6 +153,10 @@ function firstTick () {
 
         CreateNodes();
     });
+}
+
+function UpdateTitle (lastSongInfo) {
+    document.getElementsByTagName("title")[0].innerHTML = lastSongInfo;
 }
 
 function CreateLiveNode (songName, coverUrl) {
@@ -453,10 +463,11 @@ function overflowTick () {
 }
 
 // Gold 104.3 has a couple of songs with mis-spelt names. (The pricks there can't spell for shit) This corrects them in the display.
-// (Probably not a complete list, but the ones I noticed are here: )
+// (Not a complete list, but the ones I noticed are here: )
 function correctSpellingMistakes(song) {
     if (song == 'Kim Wilde - Chequred Love') { return 'Kim Wilde - Chequered Love'; }
     if (song == 'Nena - 99 Luftballoons') { return 'Nena - 99 Luftballons' }
+    if (song == 'Nena - 99 Red Balloons (English Version)') { return 'Nena - 99 Red Balloons'; }
     if (song == 'Billy Ocean - When The Going Gets Tough, The Tough Ge') { return 'Billy Ocean - When the Going Gets Tough, the Tough Get Going';}
     if (song == 'Thompson Twins - Doctor, Doctor') return 'Thompson Twins - Doctor! Doctor!';
     if (song == 'Sonia Dada - You Don\'t Treat Me No Good*') return 'Sonia Dada - (Lover) You Don\'t Treat Me No Good';
@@ -473,12 +484,23 @@ function correctSpellingMistakes(song) {
     if (song == 'Run DMC and Aerosmith - Walk This Way') return 'Run-D.M.C. & Aerosmith - Walk This Way';
     if (song == 'The Go,Betweens - Streets Of Your Town') return 'The Go-Betweens - Streets of Your Town';
     if (song == 'M - Pop Muzic') return 'M - Pop Muzik';
-    if (song == 'Kiss - Rock And Roll All Nite') return 'Rock and Roll All Nite';
+    if (song == 'Kiss - Rock And Roll All Nite') return 'Kiss - Rock and Roll All Nite';
     if (song == 'Whitney Houston - I Wanna Dance With Somebody') return 'Whitney Houston - I Wanna Dance with Somebody (Who Loves Me)';
     if (song == 'Inner Circle - Sweat (a la la la la long)') return 'Inner Circle - Sweat (A La La La La Long)';
     if (song == 'Matchbox Twenty - 3am') return 'Matchbox Twenty - 3AM';
     if (song == 'Philip Oakey & Giorgio Moroder - Together In Electric Dreams') return 'Philip Oakey & Giorgio Moroder - Together in Electric Dreams';
     if (song == 'The Offspring - Pretty Fly For A Whiteguy') return 'The Offspring - Pretty Fly (For a White Guy)';
+    if (song == 'Samantha Fox - Touch Me (IWant Your Body)') return 'Samantha Fox - Touch Me (I Want Your Body)';
+    if (song == 'C & C Music Factory - Things That Make You Go Mmmm') return 'C+C Music Factory - Things That Make You Go Hmmm...';
+    if (song == 'Miami Sound Machine - Dr Beat') return 'Miami Sound Machine - Dr. Beat';
+    if (song == 'Gwen Stefani - What You Waiting For') return 'Gwen Stefani - What You Waiting For?';
+    if (song == 'Stevie Wright - Evie 1,2,3') return 'Stevie Wright - Evie';
+    if (song == 'Tommy Tutone - 867,5309') return 'Tommy Tutone - 867-5309/Jenny';
+    if (song == 'Robbie Nevil - C\'est La Vie') return 'Robbie Nevil - C\'est la Vie';
+    if (song == 'Robbie Nevil - C\'est La Vie') return 'Hoodoo Gurus - Like Wow - Wipeout!';
+    if (song == 'Divinyls - ONLY LONELY') return 'The Divinyls - Only Lonely';
+    if (song == 'Beatles - Ob La Di, Ob La Da') return 'The Beatles - Ob-La-Di, Ob-La-Da';
+    if (song == 'Mondo Rock - Summer Of 81') return 'Mondo Rock - Summer of \'81';
     if (song.substring(0, 4) == 'A,Ha') return ('A-ha' + song.substring(4, song.length));
     if (song.substring(0, 11) == 'Cranberries') return ('The Cranberries' + song.substring(11, song.length)); // Even though I can't stand this band, I  still decided I'd add them to the list.
     if (song.substring(0, 7) == 'Bangles') return ('The Bangles' + song.substring(7, song.length));
@@ -499,6 +521,17 @@ function correctSpellingMistakes(song) {
     song = checkArtistName(song, 'The Presidents Of The Usa', 'The Presidents of the USA');
     song = checkArtistName(song, 'Run DMC', 'Run D.M.C.');
     song = checkArtistName(song, 'Corrs', 'The Corrs');
+    song = checkArtistName(song, 'Olivia Newton,John', 'Olivia Newton-John');
+    song = checkArtistName(song, 'John Travolta w/ Olivia Newton,John', 'John Travolta w/ Olivia Newton-John');
+    song = checkArtistName(song, 'Fr David', 'F.R. David');
+    song = checkArtistName(song, 'Phd', "Ph.D.");
+    song = checkArtistName(song, 'Dr Hook', 'Dr. Hook');
+    song = checkArtistName(song, 'C & C Music Factory', 'C+C Music Factory');
+    song = checkArtistName(song, 'Communards', 'The Communards');
+    song = checkArtistName(song, 'Jacksons', 'The Jacksons');
+    song = checkArtistName(song, 'Divinyls', 'The Divinyls');
+    song = checkArtistName(song, 'Uncanny X,Men', 'Uncanny X-Men');
+    
     return song;
 }
 

@@ -173,3 +173,7 @@
     height: 22px;
     z-index: 10;
 }
+
+.minimise-btn {
+    pointer-events: all;
+}
