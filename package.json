@@ -1,14 +1,28 @@
 {
-  "name": "electron-project-1",
-  "version": "0.0.1",
-  "description": "",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "author": "Michael",
-  "license": "ISC",
-  "dependencies": {
-    "electron": "^2.0.7"
-  }
+    "name": "radiorecieverapp",
+    "version": "0.0.1",
+    "description": "An application to recieve the broadcasted radio information (from Melbourne's Gold 104.3)",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "bin": "build"
+    },
+    "author": "mikejzx",
+    "devDependencies": {
+        "electron": "^2.0.18",
+        "electron-builder": "^20.39.0"
+    },
+    "build": {
+        "appId": "io.mikejzx.github.radiorecieverapp",
+        "linux": {
+            "target": [
+                "AppImage",
+                "deb",
+                "pkg.tar.xz"
+            ]
+        },
+        "win": {
+            "target": "NSIS"
+        }
+    }
 }
