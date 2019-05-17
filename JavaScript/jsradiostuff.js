@@ -21,7 +21,7 @@ window.onload = function () {
     firstTick();
     setInterval(tick, 3000);
 
-    UpdateTitle('This is working?');
+    UpdateTitle('Mike\'s Radio Reciever app');
 
     document.onmousedown = documentMouseDown;
 };
@@ -156,7 +156,8 @@ function firstTick () {
 }
 
 function UpdateTitle (lastSongInfo) {
-    document.getElementsByTagName("title")[0].innerHTML = lastSongInfo;
+    var tit = correctLetterAccents(correctSpellingMistakes(lastSongInfo));
+    document.getElementsByTagName("title")[0].innerHTML = tit;
 }
 
 function CreateLiveNode (songName, coverUrl) {
