@@ -105,7 +105,7 @@ global.createAboutWindow = function () {
 
 global.showBalloon = function(songName) {
     tray.displayBalloon({
-        icon: '/img/tb_icon-shadow.png',
+        icon: path.join(__dirname, '/img/tb_icon-shadow.png'),
         title: 'Now Playing On Gold 104.3',
         content: (songName + '\nMichael\'s Radio Reciever App!')
     });
