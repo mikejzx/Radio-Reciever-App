@@ -5,19 +5,17 @@
     "main": "main.js",
     "scripts": {
         "start": "electron .",
-        "bin": "build"
+        "dist": "electron-builder"
     },
     "author": "mikejzx",
     "devDependencies": {
         "electron": "^2.0.18",
-        "electron-builder": "^20.39.0"
+        "electron-builder": "^20.44.4"
     },
     "build": {
         "appId": "io.mikejzx.github.radiorecieverapp",
         "linux": {
             "target": [
-                "AppImage",
-                "deb",
                 "pkg.tar.xz"
             ]
         },

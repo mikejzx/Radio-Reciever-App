@@ -466,6 +466,13 @@ function overflowTick () {
 // Gold 104.3 has a couple of songs with mis-spelt names. (The pricks there can't spell for shit) This corrects them in the display.
 // (Not a complete list, but the ones I noticed are here: )
 function correctSpellingMistakes(song) {
+    // First perform '12" EXTENDED' check.
+    extended = "12\" EXTENDED";
+    if (song.includes(extended)) {
+        song = song.substring(0, song.length - extended.length) + " (Extended 12\" Mix)";
+    }
+
+    // Then proceed with spelling
     if (song == 'Kim Wilde - Chequred Love') { return 'Kim Wilde - Chequered Love'; }
     if (song == 'Nena - 99 Luftballoons') { return 'Nena - 99 Luftballons' }
     if (song == 'Nena - 99 Red Balloons (English Version)') { return 'Nena - 99 Red Balloons'; }
@@ -502,6 +509,8 @@ function correctSpellingMistakes(song) {
     if (song == 'Divinyls - ONLY LONELY') return 'The Divinyls - Only Lonely';
     if (song == 'Beatles - Ob La Di, Ob La Da') return 'The Beatles - Ob-La-Di, Ob-La-Da';
     if (song == 'Mondo Rock - Summer Of 81') return 'Mondo Rock - Summer of \'81';
+    if (song == 'Irene Cara - Flashdance...What A Feeling') return 'Irene Cara - Flashdance... What a Feeling';
+    if (song == 'Re,Flex - The Politics Of Dancing') return 'Re-Flex - The Politics of Dancing';
     if (song.substring(0, 4) == 'A,Ha') return ('A-ha' + song.substring(4, song.length));
     if (song.substring(0, 11) == 'Cranberries') return ('The Cranberries' + song.substring(11, song.length)); // Even though I can't stand this band, I  still decided I'd add them to the list.
     if (song.substring(0, 7) == 'Bangles') return ('The Bangles' + song.substring(7, song.length));
@@ -532,6 +541,9 @@ function correctSpellingMistakes(song) {
     song = checkArtistName(song, 'Jacksons', 'The Jacksons');
     song = checkArtistName(song, 'Divinyls', 'The Divinyls');
     song = checkArtistName(song, 'Uncanny X,Men', 'Uncanny X-Men');
+    song = checkArtistName(song, 'Who', 'The Who');
+    song = checkArtistName(song, 'Re,Flex', 'Re-Flex');
+    song = checkArtistName(song, 'Rolling Stones', 'The Rolling Stones');
     
     return song;
 }
