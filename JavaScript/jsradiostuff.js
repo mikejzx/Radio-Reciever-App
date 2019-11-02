@@ -226,8 +226,8 @@ function CreateLiveNode (songName, coverUrl) {
         ytLink.textContent = "Open in YouTube";
         dropdown.appendChild(ytLink);
         var goLink = document.createElement('a');
-        goLink.href = "https://www.google.com/search?q=" + escape(songName);
-        goLink.textContent = "Google this Song";
+        goLink.href = "https://duckduckgo.com/?q=" + escape(songName);
+        goLink.textContent = "DuckDuckGo this Song";
         dropdown.appendChild(goLink);
 
         document.getElementById('dropdown-container').appendChild(dropdown);
@@ -325,10 +325,10 @@ function CreateRegularNode (songName, timePlayed, idx, coverUrl) {
         ytLink.href = "https://www.youtube.com/results?search_query=" + escape(songName);
         ytLink.textContent = "Open in YouTube";
         dropdown.appendChild(ytLink);
-        // Open in Google
+        // Open in DuckDuckGo
         var goLink = document.createElement('a');
-        goLink.href = "https://www.google.com/search?q=" + escape(songName);
-        goLink.textContent = "Google this Song";
+        goLink.href = "https://duckduckgo.com/?q=" + escape(songName);
+        goLink.textContent = "DuckDuckGo this Song";
         dropdown.appendChild(goLink);
 
         document.getElementById('dropdown-container').appendChild(dropdown);
@@ -511,6 +511,7 @@ function correctSpellingMistakes(song) {
     if (song == 'Mondo Rock - Summer Of 81') return 'Mondo Rock - Summer of \'81';
     if (song == 'Irene Cara - Flashdance...What A Feeling') return 'Irene Cara - Flashdance... What a Feeling';
     if (song == 'Re,Flex - The Politics Of Dancing') return 'Re-Flex - The Politics of Dancing';
+    if (song == "Joe Cocker - Un,Chain My Heart") return "Joe Cocker - Unchain My Heart"
     if (song.substring(0, 4) == 'A,Ha') return ('A-ha' + song.substring(4, song.length));
     if (song.substring(0, 11) == 'Cranberries') return ('The Cranberries' + song.substring(11, song.length)); // Even though I can't stand this band, I  still decided I'd add them to the list.
     if (song.substring(0, 7) == 'Bangles') return ('The Bangles' + song.substring(7, song.length));

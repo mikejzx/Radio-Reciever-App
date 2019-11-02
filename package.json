@@ -22,5 +22,8 @@
         "win": {
             "target": "NSIS"
         }
+    },
+    "dependencies": {
+        "npm": "^6.11.3"
     }
 }

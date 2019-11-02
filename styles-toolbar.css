@@ -83,6 +83,8 @@
     color: #222;
     border-radius: 3px;
     overflow: hidden;
+
+    width: 160px;
 }
 
 .dropdown-content:hover {
@@ -127,6 +129,8 @@
     outline: 1px solid transparent;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
     white-space: nowrap;
+
+    width: 100%;
 }
 
 .dropdown-content a:hover {

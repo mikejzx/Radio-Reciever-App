@@ -8,6 +8,8 @@ let mainWindow;
 let aboutWindow;
 let tray = null;
 
+app.disableHardwareAcceleration();
+
 // Listen for app to be ready
 app.on('ready', function() {
     // Create window
@@ -23,6 +25,10 @@ app.on('ready', function() {
         icon: path.join(__dirname, '/img/tb_icon-shadow.png'),
         resizable: false,
         title: 'Michael\'s Station Reciever Client',
+
+        webPreferences: {
+            preload: path.resolve(path.join(__dirname, 'preload.js'))
+        }
     });
 
     // Load html into window
